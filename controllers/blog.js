@@ -16,9 +16,12 @@ blogRouter.post('/', (request, response) => {
 		if (!request.body.likes){
 			request.body.likes = 0
 		}
-		const newBlog = new Blog(request.body)
-		const result = newBlog.save()
-		response.status(201).json(result)
+		if ((!request.body.title) && (!request.body.url)){
+			response.status(400).json({error: 
+				'title and url can not be missing!'})
+		}else{const newBlog = new Blog(request.body)
+			const result = newBlog.save()
+			response.status(201).json(result)}
 	}catch(exception){
 		console.log(exception)
 	}

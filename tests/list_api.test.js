@@ -96,6 +96,17 @@ test('check adding a blog without likes', async()=>{
 	expect(added.likes).toBe(0)
 })
 
+test('check when title and url are missing when adding blog', async ()=>{
+	const newBlog = {
+		'author': 'Jenni',
+		'likes': 98
+	}
+	await api
+		.post('/api/blogs')
+		.send(newBlog)
+		.expect(400)
+})
+
 afterAll(() => {
 	mongoose.connection.close()
 })
