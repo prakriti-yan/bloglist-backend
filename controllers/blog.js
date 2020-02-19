@@ -4,17 +4,17 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 
-blogRouter.get('/', async (request, response) => {
+blogRouter.get('/', async (request, response, next) => {
 	try{
 		const blogs = await Blog.find({}).populate('user', {username: 1, name: 1})
 		response.json(blogs.map(blog=>
 			blog.toJSON()))
 	}catch(exception){
-		console.log(exception)
+		next(exception)
 	}
 })
 
-blogRouter.get('/:id', async (request, response)=>{
+blogRouter.get('/:id', async (request, response, next)=>{
 	try{
 		const blog = await Blog.findById(request.params.id)
 		if (blog){
@@ -23,21 +23,29 @@ blogRouter.get('/:id', async (request, response)=>{
 			response.status(404).end()
 		}
 	}catch(exception){
-		console.log(exception)
+		next(exception)
 	}
 })
 
-blogRouter.delete('/:id', async(request, response)=>{
+blogRouter.delete('/:id', async(request, response, next)=>{
+	const token = request.token
+	const blog = await Blog.findById(request.params.id)
 	try{
-		await Blog.findByIdAndRemove(request.params.id)
-		response.status(204).end()
+		const decodedToken = jwt.verify(token, process.env.SECRET)
+		if (!token || !decodedToken.id){
+			return response.status(401).json({ error: 'token missing or invalid !'})
+		}else if (blog.user.toString() !== decodedToken.id){
+			return response.status(401).json({ error: 'Not the author for the blog, can not delete !'})
+		}else{
+			await Blog.findByIdAndRemove(request.params.id)
+			response.status(204).end()}
 	}catch(exception){
-		console.log(exception)
+		next(exception)
 	}
 
 })
 
-blogRouter.put('/:id', async(request, response)=>{
+blogRouter.put('/:id', async(request, response, next)=>{
 	const body = request.body
 	const blog ={
 		'title': body.title,
@@ -49,21 +57,12 @@ blogRouter.put('/:id', async(request, response)=>{
 		const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
 		response.json(updatedBlog.toJSON())
 	}catch(exception){
-		console.log(exception)
+		next(exception)
 	}
 })
 
-const getTokenFrom = request => {
-	const authorization = request.get('authorization')
-	if (authorization && authorization.toLowerCase().startsWith('bearer ')){
-		return authorization.substring(7)
-	}
-	return null
-}
-// the function getTokenFrom isolate the token from the authorization header.
-
 blogRouter.post('/', async (request, response, next) => {
-	const token = getTokenFrom(request)
+	const token = request.token
 
 	try{
 		const decodedToken = jwt.verify(token, process.env.SECRET)
