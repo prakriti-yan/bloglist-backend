@@ -62,7 +62,7 @@ const getTokenFrom = request => {
 }
 // the function getTokenFrom isolate the token from the authorization header.
 
-blogRouter.post('/', async (request, response) => {
+blogRouter.post('/', async (request, response, next) => {
 	const token = getTokenFrom(request)
 
 	try{
@@ -89,7 +89,7 @@ blogRouter.post('/', async (request, response) => {
 			await user.save()
 			response.json(savedBlog.toJSON())}
 	}catch(exception){
-		console.log(exception)
+		next(exception)
 	}
 })
 
