@@ -1,6 +1,8 @@
 const blogRouter= require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
 
 blogRouter.get('/', async (request, response) => {
 	try{
@@ -51,8 +53,24 @@ blogRouter.put('/:id', async(request, response)=>{
 	}
 })
 
+const getTokenFrom = request => {
+	const authorization = request.get('authorization')
+	if (authorization && authorization.toLowerCase().startsWith('bearer ')){
+		return authorization.substring(7)
+	}
+	return null
+}
+// the function getTokenFrom isolate the token from the authorization header.
+
 blogRouter.post('/', async (request, response) => {
+	const token = getTokenFrom(request)
+
 	try{
+		const decodedToken = jwt.verify(token, process.env.SECRET)
+		// The object decoded from the token contains the username and id fields, which tells the server who made the request.
+		if (!token || !decodedToken.id){
+			return response.status(401).json({ error: 'token missing or invalid !'})
+		}
 		if (!request.body.likes){
 			request.body.likes = 0
 		}
@@ -61,15 +79,11 @@ blogRouter.post('/', async (request, response) => {
 				'title and url can not be missing!'})
 		}else{
 			const body = request.body
-			const user = await User.findById(body.user)
-			console.log(user)
-			const newBlog = new Blog({
-				author: body.author,
-				title: body.title,
-				url: body.title,
-				likes: body.likes,
-				user: user._id
-			})
+			const user = await User.findById(decodedToken.id)
+			// it is important to change the findById(body.user) to decodedToken.id, since this id is the id for user.
+			// so the userId is not needed when posting a new post!!!!
+			const newBlog = new Blog(body)
+			newBlog.user = user.id
 			const savedBlog = await newBlog.save()
 			user.blogs = user.blogs.concat(savedBlog)
 			await user.save()
