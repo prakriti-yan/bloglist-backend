@@ -11,13 +11,13 @@ content-type: application/json
 
 POST http://localhost:3003/api/blogs
 content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkNoZW4iLCJpZCI6IjVlNGQwMTZiYjg1YzU1MjU4MGM2Njc4OSIsImlhdCI6MTU4MjEwNjU3OH0.2q3k7lV-cMgnXhOQeoJQ6zW8J5t7fXghU7F-gzbziKY
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkxpbiIsImlkIjoiNWU0ZTUwOWQ3ZmM2YTE2YmM3YjkxY2RkIiwiaWF0IjoxNTgyMTkwNzU0fQ.7qppzw1DZqBNl-JV6vbrSYsVG-EkgBMW3tSGksjMWVA
 
 {
-	"title": "New feature implemented!",
+	"title": "Today is Thursday!!",
 	"url": "localhost:3006",
 	"author": "Lin",
-	"likes": 68
+	"likes": 657
 	# "user": "5e4cfe3d946538226d041f0e"
 }
 
