@@ -12,7 +12,7 @@ const morgan = require('morgan')
 
 console.log('connecting to', config.MONGODB_URI)
 
-mongoose.connect(config.URL, { useNewUrlParser: true })
+mongoose.connect(config.URL, { useNewUrlParser: true, useUnifiedTopology: true })
 	.then(()=>{
 		console.log('connected to MongoDB')
 	})
