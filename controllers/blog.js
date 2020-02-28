@@ -49,7 +49,7 @@ blogRouter.delete('/:id', async(request, response, next)=>{
 
 blogRouter.put('/:id', async(request, response, next)=>{
 	const body = request.body
-	const blog ={
+	const blog = {
 		'title': body.title,
 		'author': body.author,
 		'url': body.url,
@@ -68,7 +68,6 @@ blogRouter.post('/', async (request, response, next) => {
 
 	try{
 		const decodedToken = jwt.verify(token, process.env.SECRET)
-		// The object decoded from the token contains the username and id fields, which tells the server who made the request.
 		if (!token || !decodedToken.id){
 			return response.status(401).json({ error: 'token missing or invalid !'})
 		}
@@ -81,8 +80,6 @@ blogRouter.post('/', async (request, response, next) => {
 		}else{
 			const body = request.body
 			const user = await User.findById(decodedToken.id)
-			// it is important to change the findById(body.user) to decodedToken.id, since this id is the id for user.
-			// so the userId is not needed when posting a new post!!!!
 			const newBlog = new Blog(body)
 			newBlog.user = user.id
 			const savedBlog = await newBlog.save()
