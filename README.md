@@ -7,5 +7,7 @@ Blog platform as a full stack web app with user authentication and blog post lis
 The website is hosted on Heroku: https://bloglist-yan.herokuapp.com/
 
 The demo user:
+<br>
 username: Demo
+<br>
 password: Demo
